@@ -26,7 +26,7 @@ jobs:
       - name: Build app
         run: |
           echo -e"\n\tApp: ${{ env.APP }}\n\tVersion: ${{ steps.read-version.outputs.version }}\n"
-          build/build.sh ${{ env.APP }} ${{ steps.read-version.outputs.version }}
+          build/build.bash ${{ env.APP }} ${{ steps.read-version.outputs.version }}
 
       - name: Compress assets
         run: |

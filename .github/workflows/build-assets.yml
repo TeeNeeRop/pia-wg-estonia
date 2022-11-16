@@ -1,0 +1,46 @@
+---
+name: Build Release
+
+on:
+  workflow_dispatch:
+env:
+  APP: pia-wg-config
+  GO-VERSION: 1.19.3
+jobs:
+  build-assets:
+    runs-on: ubuntu-20.04
+    outputs:
+      new_version: ${{ steps.read-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO-VERSION }}
+
+      - name: Get app version from repo
+        id: read-version
+        run: |
+          cat build/version.txt >> $GITHUB_OUTPUT
+
+      - name: Build app
+        run: |
+          echo -e"\n\tApp: ${{ env.APP }}\n\tVersion: ${{ steps.read-version.outputs.version }}\n"
+          build/build.sh ${{ env.APP }} ${{ steps.read-version.outputs.version }}
+
+      - name: Compress assets
+        run: |
+          cd /tmp
+          for i in $(ls ${{ env.APP }}*); do
+            tar cvaf $i.tar.gz $i
+          done
+
+      - name: Create GitHub release with assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.read-version.outputs.version }}
+          name: ${{ steps.read-version.outputs.version }}
+          body: ${{ steps.read-version.outputs.version }}
+          fail_on_unmatched_files: true
+          files: |
+            /tmp/${{ env.APP }}*.tar.gz

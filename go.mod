@@ -1,4 +1,4 @@
-module github.com/kylegrantlucas/pia-wg-config
+module github.com/TeeNeeRop/pia-wg-estonia
 
 go 1.19
 
